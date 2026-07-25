@@ -1,34 +1,5 @@
-<!DOCTYPE html><html><head><title>C-39 end-to-end</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<h1 id="h1">C-39 end-to-end (operator-owned page)</h1>
-<img src="own-asset.png" alt="">
-<input type="text">
-<button>no label</button>
-
-<!-- THE ESCAPE: pure markup. No script, no event handler - nothing the snapshot sanitiser strips.
-     Absolute URL because the renderer rewrites <base href> to the scanned origin.
-     ?instance= names the report page's React useId()-derived snapshot instance. -->
-<iframe src="https://accessibility.browserstack.com/?instance=r7a" width="120" height="60" title="e1"></iframe>
-<iframe src="https://accessibility.browserstack.com/home?instance=r7a" width="120" height="60" title="e2"></iframe>
-<iframe src="https://accessibility.browserstack.com/?instance=r6u" width="120" height="60" title="e3"></iframe>
-
-<div id="dyn"></div>
-<script>
-(async function () {
-  try {
-    await navigator.serviceWorker.register('sw.js', { scope: './' });
-    await navigator.serviceWorker.ready;
-    for (var i = 0; i < 40 && !navigator.serviceWorker.controller; i++) await new Promise(function (r) { setTimeout(r, 100) });
-    // Reference BrowserStack's bootstrap script ONLY once the SW controls this page, so the
-    // recorder's fetch is answered by the SW and the bytes stored under that key are ours.
-    document.getElementById('dyn').innerHTML =
-      '<link rel="stylesheet" href="https://static-assets.browserstack.com/accessibility/theme-loader.js">';
-    var d = document.createElement('div');
-    d.textContent = 'SW_CONTROLLED=' + !!navigator.serviceWorker.controller;
-    document.body.appendChild(d);
-  } catch (e) {}
-})();
-</script>
+<!DOCTYPE html><html><head><title>decommissioned</title></head><body>
+<h1>Decommissioned</h1>
+<p>This page previously hosted an authorised security-research test target. The test payload and its
+service worker have been removed. No active content remains.</p>
 </body></html>
