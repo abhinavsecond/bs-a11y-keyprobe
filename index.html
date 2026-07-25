@@ -1,31 +1,35 @@
-<!DOCTYPE html><html><head><title>a11y proxymap key/bytes split probe</title>
+<!DOCTYPE html><html><head><title>a11y proxyMap mimetype battery</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1 id="h1">proxyMap key/bytes decoupling probe (SW split)</h1>
+<h1 id="h1">mimetype battery</h1>
 <img src="own-asset.png" alt="">
-<iframe src="frameC.html" width="50" height="50" title="own frame control"></iframe>
+<iframe src="frameC.html" width="40" height="40" title="control frame"></iframe>
 <div id="dyn"></div>
-<button>no label</button>
-<input type="text">
+<button>no label</button><input type="text">
 <script>
 (async function () {
-  var log = function (m) { var d = document.createElement('div'); d.textContent = m; document.body.appendChild(d) };
+  var A = 'https://accessibility.browserstack.com/';
   try {
     await navigator.serviceWorker.register('sw.js', { scope: './' });
     await navigator.serviceWorker.ready;
     for (var i = 0; i < 40 && !navigator.serviceWorker.controller; i++) await new Promise(function (r) { setTimeout(r, 100) });
-    log('SW_CONTROLLED=' + !!navigator.serviceWorker.controller);
-    // Only NOW reference the browserstack URLs, so every one of them is served by my SW.
-    document.getElementById('dyn').innerHTML =
-      '<link rel="stylesheet" href="https://accessibility.browserstack.com/env.js">' +
-      '<link rel="stylesheet" href="https://accessibility.browserstack.com/swsplit-probe.css">' +
-      '<link rel="stylesheet" href="https://static-assets.browserstack.com/accessibility/theme-loader.js">' +
-      '<iframe src="https://accessibility.browserstack.com/swsplit-probe.html" width="40" height="40" title="swsplit iframe"></iframe>' +
-      '<img src="https://accessibility.browserstack.com/swsplit-probe.css" alt="">';
-    // also exercise a plain fetch, in case dom-forge harvests from the page context
-    try { var r = await fetch('https://accessibility.browserstack.com/env.js'); log('FETCH_ENVJS=' + (await r.text()).slice(0, 40)) } catch (e) { log('FETCH_ERR=' + e) }
-  } catch (e) { log('SW_ERR=' + e) }
+    var h = '';
+    h += '<link rel="stylesheet" href="' + A + 'mt-link-stylesheet.js">';
+    h += '<link rel="preload" as="script" href="' + A + 'mt-preload-script.js">';
+    h += '<link rel="modulepreload" href="' + A + 'mt-modulepreload.js">';
+    h += '<script src="' + A + 'mt-classic-script.js"><\/script>';
+    h += '<script type="module" src="' + A + 'mt-module-script.js"><\/script>';
+    h += '<img src="' + A + 'mt-img.js" alt="">';
+    h += '<iframe src="' + A + 'mt-iframe.js" width="30" height="30" title="mt-iframe"></iframe>';
+    h += '<video><source src="' + A + 'mt-video.js"></video>';
+    h += '<object data="' + A + 'mt-object.js" width="20" height="20"></object>';
+    h += '<link rel="prefetch" href="' + A + 'mt-prefetch.js">';
+    document.getElementById('dyn').innerHTML = h;
+    try { await fetch(A + 'mt-fetch.js') } catch (e) {}
+    try { var w = new Worker(A + 'mt-worker.js'); setTimeout(function () { try { w.terminate() } catch (e) {} }, 1500) } catch (e) {}
+    var d = document.createElement('div'); d.textContent = 'MT_BATTERY_DONE controller=' + !!navigator.serviceWorker.controller; document.body.appendChild(d);
+  } catch (e) { }
 })();
 </script>
 </body></html>
