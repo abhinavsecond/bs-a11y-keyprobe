@@ -12,6 +12,18 @@
 <iframe src="https://accessibility.browserstack.com/probe-iframe-a11y.html" width="50" height="50" title="a11y iframe probe"></iframe>
 <iframe src="frameB.html" width="50" height="50" title="base split probe"></iframe>
 <iframe src="frameC.html" width="50" height="50" title="own frame control"></iframe>
+
+<!-- KEY/BYTES DECOUPLING PROBES -->
+<!-- D1: src+srcdoc together. srcdoc wins for the LOAD, src is what the DOM says. -->
+<iframe src="https://accessibility.browserstack.com/env.js" srcdoc="&lt;h2&gt;D1_ATTACKER_SRCDOC_BYTES&lt;/h2&gt;&lt;input type=text&gt;" width="50" height="50" title="D1"></iframe>
+<!-- D2: same trick aimed at the cross-origin bootstrap script, with a JS-comment-first body -->
+<iframe src="https://static-assets.browserstack.com/accessibility/theme-loader.js" srcdoc="&lt;!--D2_ATTACKER_SRCDOC_BYTES--&gt;&lt;input type=text&gt;" width="50" height="50" title="D2"></iframe>
+<!-- D3: srcset candidate points at a11y while src is attacker-owned -->
+<img src="own-asset.png" srcset="https://accessibility.browserstack.com/env.js 2x" alt="">
+<!-- D4: preload as=script for an a11y url -->
+<link rel="preload" as="script" href="https://accessibility.browserstack.com/preload-probe.js">
+<!-- D5: object/embed -->
+<object data="https://accessibility.browserstack.com/object-probe.html" width="30" height="30"></object>
 <button>no label</button>
 <input type="text">
 </body></html>
